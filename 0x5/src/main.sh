@@ -19,3 +19,6 @@ else
 	echo "Wrong arguments! Usage: ./main.sh/sysireet/"
 	exit
 fi
+
+# edit last 2 top 10 funcs
+# fix measurement of execution time
