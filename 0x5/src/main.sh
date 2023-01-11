@@ -2,7 +2,7 @@
 
 . print.sh
 
-start_time="$(date -u +%s.%N)"
+start_time="$(date +%s.%1N)"
 
 if [[ $# == 1 && -d $1 && "$1" =~ '/'$ ]]
 then
@@ -10,12 +10,12 @@ then
 	printTop5
 	printTotalNumberOfFiles
 	printNumberOfDifferentFileTypes
+	print_top_10_files
+	print_top_10_exec
+	end_time="$(date +%s.%1N)"
+	total_time="$(bc <<<"$end_time-$start_time")"
+	echo "Script execution time (in seconds) = $total_time"
 else
 	echo "Wrong arguments! Usage: ./main.sh/sysireet/"
 	exit
 fi
-
-end_time="$(date -u +%s.%N)"
-
-# elapsed="$(bc <<<"$end_time-$start_time")"
-# echo "Total of $elapsed seconds elapsed for process"
