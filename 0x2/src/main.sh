@@ -2,17 +2,17 @@
 
 . print.sh
 
-HOSTNAME=$(hostname)
-TIMEZONE="$(cat /etc/timezone) $(date -u "+%Z") $(date "+%z")"
-USER=$(whoami)
-OS=$(awk '{print $1, $2, $3}' /etc/issue)
-DATE=$(date "+%d %b %Y %H:%M:%S")
-UPTIME=$(uptime -p)
+HOSTNAME=$(hostname) #host's name
+TIMEZONE="$(cat /etc/timezone) $(date -u "+%Z") $(date "+%z")" #timezone, UTC, +xx00
+USER=$(whoami) #name of currently logged in user
+OS=$(awk '{print $1, $2, $3}' /etc/issue) #prints only os name w/o '/n' '/l'
+DATE=$(date "+%d %b %Y %H:%M:%S") # prints date in proper format
+UPTIME=$(uptime -p) 
 UPTIME_SEC=$(awk '{print $1}' /proc/uptime)
-IP=$(hostname -I)
-MASK=$(ip address | grep "scope global" | grep -o "/\w*")
-GATEWAY=$(ip r | grep default | awk '{print $3}')
-RAM_TOTAL=$(free -m | grep Mem | awk '{printf "%.3f GB", $2/1024}')
+IP=$(hostname -I) # prints ip addr instead of name
+MASK=$(ifconfig | grep -m1 netmask | awk '{print $4}') # mask in xxx.xxx.xxx.xxx format
+GATEWAY=$(ip r | grep default | awk '{print $3}') # ip of default gateway
+RAM_TOTAL=$(free -m | grep Mem | awk '{printf "%.3f GB", $2/1024}') 
 RAM_USED=$(free -m | grep Mem | awk '{printf "%.3f GB", $3/1024}')
 RAM_FREE=$(free -m | grep Mem | awk '{printf "%.3f GB", $4/1024}')
 SPACE_ROOT=$(df /root/ | awk '/\// {printf "%.2f MB", $2/1024}')

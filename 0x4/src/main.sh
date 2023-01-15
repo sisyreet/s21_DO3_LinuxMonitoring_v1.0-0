@@ -1,46 +1,59 @@
 #!/bin/bash
 
 . print.sh
-. configs/configuration
+. parse_sys_info.sh
+. configs/custom_configuration.conf
+. configs/default_configuration.conf
 
-#font colors
-fcolors=("\e[1;37" "\e[0;31m" "\e[0;32m" "\e[0;34m" "\e[0;35m" "\e[0;30m")
-bcolors=("\e[47m" "\e[41m" "\e[42m" "\e[44m" "\e[45m" "\e[40m")
-ncolors=("white" "red" "green" "blue" "purple" "black" "no color")
-def_colors=("2" "3" "3" "4")
-NC='\e[0m' # No Color
+f_colors_codes=("\e[1;37" "\e[0;31m" "\e[0;32m" "\e[0;34m" "\e[0;35m" "\e[0;30m")
+b_colors_codes=("\e[47m" "\e[41m" "\e[42m" "\e[44m" "\e[45m" "\e[40m")
+ncolors=("white" "red" "green" "blue" "purple" "black")
+names=("", "", "", "")
 
-HOSTNAME=$(hostname)
-TIMEZONE="$(cat /etc/timezone) $(date -u "+%Z") $(date "+%z")"
-USER=$(whoami)
-OS=$(awk '{printf $1" "$2" "$3}' /etc/issue)
-DATE=$(date "+%d %b %Y %H:%M:%S")
-UPTIME=$(uptime -p)
-UPTIME_SEC=$(awk '{print $1}' /proc/uptime)
-IP=$(hostname -I)
-MASK=$(ip address | grep "scope global" | grep -o "/\w*")
-GATEWAY=$(ip r | grep default | awk '{print $3}')
-RAM_TOTAL=$(free -m | grep Mem | awk '{printf "%.3f GB", $2/1024}')
-RAM_USED=$(free -m | grep Mem | awk '{printf "%.3f GB", $3/1024}')
-RAM_FREE=$(free -m | grep Mem | awk '{printf "%.3f GB", $4/1024}')
-SPACE_ROOT=$(df /root/ | awk '/\// {printf "%.2f MB", $2/1024}')
-SPACE_ROOT_USED=$(df /root/ | awk '/\// {printf "%.2f MB", $3/1024}')
-SPACE_ROOT_FREE=$(df /root/ | awk '/\// {printf "%.2f MB", $4/1024}')
+colors[0]=$column1_background
+colors[1]=$column1_font_color
+colors[2]=$column2_background
+colors[3]=$column2_font_color
 
-cmp="^[1-6]$"
-if ! [[ $column1_font_color =~ $cmp && $column1_background =~ $cmp && $column2_font_color =~ $cmp && $column2_background =~ $cmp ]]
-then
-	echo -e "\e[1;31mwrong configuration, default color scheme was applied\e[0;m\n"
-	print_vars "${fcolors[6]}" "${bcolors[6]}" "${fcolors[6]}" "${bcolors[6]}"
-	exit
-else
-	if [[ $column1_font_color == $column1_background || $column2_font_color == $column2_background ]]
+def_colors[0]=$column1_dbackground
+def_colors[1]=$column1_dfont_color
+def_colors[2]=$column2_dbackground
+def_colors[3]=$column2_dfont_color
+
+#check colors numbers
+for i in {0..3}
+do
+	if [[ ${colors[$i]} =~ ^[1-6]$ ]]
 	then
-	echo -e "\e[1;31mwrong configuration, default color scheme was applied\e[0;m\n"
-	print_vars "${fcolors[6]}" "${bcolors[6]}" "${fcolors[6]}" "${bcolors[6]}"
-	print_def
-	exit
+		names[$i]=${colors[$i]}
+	else
+		colors[$i]=${def_colors[$i]}
+		names[$i]="default"
+	fi
+done
+
+#check occurrences in left part
+if [[ ${colors[1]} == ${colors[0]} ]]
+then
+	colors[1]=${def_colors[1]}
+	names[1]="default"
+	if [[ ${colors[1]} == ${colors[0]} ]]
+	then
+		colors[1]=${def_colors[0]}
 	fi
 fi
 
-print_vars "${fcolors[$column1_font_color - 1]}" "${bcolors[$column1_background - 1]}" "${fcolors[$column2_font_color - 1]}" "${bcolors[$column2_background - 1]}"
+#check occurrences in right part
+if [[ ${colors[3]} == ${colors[2]} ]]
+then
+	colors[3]=${def_colors[3]}
+	names[3]="default"
+	if [[ ${colors[3]} == ${colors[2]} ]]
+	then
+		colors[3]=${def_colors[2]}
+	fi
+fi
+
+parse_sys_info
+print_vars "${f_colors_codes[colors[1] - 1]}" "${b_colors_codes[colors[0] - 1]}" "${f_colors_codes[colors[3] - 1]}" "${b_colors_codes[colors[2] - 1]}" 
+print_report "${names[0]}" "${ncolors[colors[0] - 1]}" "${names[1]}" "${ncolors[colors[1] - 1]}" "${names[2]}" "${ncolors[colors[2] - 1]}" "${names[3]}" "${ncolors[colors[3] - 1]}" 

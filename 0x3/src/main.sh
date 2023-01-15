@@ -39,7 +39,7 @@ DATE=$(date "+%d %b %Y %H:%M:%S")
 UPTIME=$(uptime -p)
 UPTIME_SEC=$(awk '{print $1}' /proc/uptime)
 IP=$(hostname -I)
-MASK=$(ip address | grep "scope global" | grep -o "/\w*")
+MASK=$(ifconfig | grep -m1 netmask | awk '{print $4}')
 GATEWAY=$(ip r | grep default | awk '{print $3}')
 RAM_TOTAL=$(free -m | grep Mem | awk '{printf "%.3f GB", $2/1024}')
 RAM_USED=$(free -m | grep Mem | awk '{printf "%.3f GB", $3/1024}')
@@ -48,4 +48,4 @@ SPACE_ROOT=$(df /root/ | awk '/\// {printf "%.2f MB", $2/1024}')
 SPACE_ROOT_USED=$(df /root/ | awk '/\// {printf "%.2f MB", $3/1024}')
 SPACE_ROOT_FREE=$(df /root/ | awk '/\// {printf "%.2f MB", $4/1024}')
 
-print_vars "${fcolors[$1-1]}" "${bcolors[$2-1]}" "${fcolors[$3-1]}" "${bcolors[$4-1]}"
+print_vars "${fcolors[$2-1]}" "${bcolors[$1-1]}" "${fcolors[$4-1]}" "${bcolors[$3-1]}"
